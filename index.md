@@ -48,7 +48,7 @@ STM32F4 has a set of dedicated I/0 pins knowns as Boot Pins, these pins are used
 ### STM32 Bootloader Features
 The STM32 Bootloader supports USART protocol and provides a lot of features. This bootloader supports a wide set of commands as described in the [application note](https://www.st.com/resource/en/application_note/cd00264342-usart-protocol-used-in-the-stm32-bootloader-stmicroelectronics.pdf).
 <figure style="text-align:center;">
-<img src="./assets/images/bootloader_cmnds.png" width="60%" >
+<img src="./assets/images/bootloader_cmnds.webp" width="60%" >
 <figcaption>STM32 Bootloader commands </figcaption>
 </figure>
 
@@ -63,7 +63,7 @@ STM32 MCUs provide a host of security features which has been described [here](h
 STM32F4 basically provides three levels of [Read Out Protection](https://www.st.com/resource/en/application_note/dm00186528-proprietary-code-readout-protection-on-microcontrollers-of-the-stm32f4-series-stmicroelectronics.pdf) :
 
 <figure style="text-align:center;">
-<img src="./assets/images/rdp_levels.png" width="60%" >
+<img src="./assets/images/rdp_levels.webp" width="60%" >
 <figcaption>STM32 RDP Levels </figcaption>
 </figure>
 
@@ -86,7 +86,7 @@ RDP Levels can always be levelled up. Downgrading from RDP1 to RDP0 can be done 
 
 For `Voltage Glitching` attack, we need to target the power supply of the MCU. Every MCU has a specifically designed power management/ regulation system, which is used for powering the internal circuitry, peripherals etc. The power supply scheme of STM32 is shown in the below figure.
 <figure style="text-align:center;">
-<img src="./assets/images/stm32_power.png" width="60%" >
+<img src="./assets/images/stm32_power.webp" width="60%" >
 <figcaption>STM32F4  Power Supply Scheme </figcaption>
 </figure>
 
@@ -118,14 +118,14 @@ Teensy board is communicating serially to the targets UART port. It also control
 
 ST-Link V2 Programmer was used to connect to the target via the SWD interface. We used STM32Cube IDE to write a sample program and flashed it to the target. A dump of the flash memory was taken to verify our results later on, a snapshot of the dump is shown below.
 <figure style="text-align:center;">
-<img src="./assets/images/org_firmware.png" width="45%" id="dump">
+<img src="./assets/images/org_firmware.webp" width="45%" id="dump">
 <figcaption>Firmware dump before enabling RDP1</figcaption>
 </figure>
 
  Next, STM32CubeProgrammer was used to enable RDP1 on the target. STM32CubeProgrammer enables us to program the Option Bytes in STM32 MCUs. RDP1 can be enabled by setting any value other than 0xAA and 0xCC.  
 
 <figure style="text-align:center;">
-<img src="./assets/images/rdp_1.png" width="70%"  >
+<img src="./assets/images/rdp_1.webp" width="70%"  >
 <figcaption>RDP1 enabled on target </figcaption>
 </figure>
 
@@ -135,7 +135,7 @@ Our aim is to dump the software, as mentioned [earlier](#stm32-bootloader-featur
 The glitcher software performs the following operation 
 ```python 
 send_read_memory_command()
-inject_glitch()
+inject_glitch(glitch_parameters)
 result= read_response()
 if result == ack:
   # RDP1 Bypassed
@@ -149,19 +149,29 @@ elif result == nack:
 
 ## Glitching the target
 
-Once the hardware and software is setup, we ran the setup for obtaining initial characterization. Obtain the glitch parameters from the characterization tests done. Fine tune the glitch parameters after each runs.
- 
-#### Note
-After fine tuning the glitch, we observed that positive ack response for read memory command is obtained, but on `comparing` the data, we only got zeros as data as shown below. This meant that RDP1 level was successfully bypassed but we were not able to read the data. On further analysis, it was understood that, Option Byte for PCROP got set during the glitching process.
+Once the hardware and software is setup, we ran the setup for obtaining initial characterization. Obtain the glitch parameters from the characterization tests done. Observe the glitch on an oscilloscope to corelate the software glitch parameters with the actual glitch impact. Narrow down the glitch parameters after each run based on the characterization results obtained.
 
 <figure style="text-align:center;">
-<img src="./assets/gifs/Pcrop.gif" width="70%" >
-<figcaption>PCROP Bit getting Set </figcaption>
+<img src="./assets/images/oscilloscope.webp" width="65%" >
+<figcaption>Observing Trigger and Glitch Parameters  </figcaption>
 </figure>
+ 
+#### Note
+During the process of narrowing down the glitch parameters, we observed that positive ack response for Read Memory command is obtained, but on comparing the data, we only got zeros as data as shown below. This meant that RDP1 level was successfully bypassed but we were not able to read the data. 
+
+<video class="center" width="80%" autoplay loop muted >
+  <source src="./assets/gifs/Pcrop.webm" type="video/webm" />
+</video>
 
 
+On further analysis, it was understood that, Option Byte for PCROP (SPRMOD) got set during the glitching process.
+
+<figure style="text-align:center;">
+<img src="./assets/images/pcrop.webp" width="95%" >
+<figcaption>PCROP Bit getting set during glitching </figcaption>
+</figure>
   
-Show gif getting 0 and PCROP in byte in STM32 software.  
+
 
 We manually unset the PCROP bit , regressed the RDP level to RDP0 , then followed the whole software setup and restarted the whole process.
  
@@ -178,20 +188,21 @@ After fine tuning the glitch, finally the glitch was successful and we obtained 
 
 As explained in the above [section](#stm32-bootloader-features), a single Read Memory Command can only read 256 bytes of data before reading the next block of data. Since the targets flash size is of 256KB, a total of 1024 successful glitches were required to extract the whole flash memory. The glitch setup was kept running till the whole firmware was extracted.
 
-<figure style="text-align:center;">
-<img src="./assets/gifs/memoryread.gif" width="70%" >
-<figcaption>Memory Read Successful</figcaption>
-</figure>
+<video class="center" width="80%" autoplay loop muted >
+  <source src="./assets/gifs/memory_read_1.webm" type="video/webm" />
+</video>
 
 
 After around **`22hrs`** and 1024 successful glitches out of 621594 glitches, the whole firmware was extracted as shown in [figure](#full_mem) below.
 <figure style="text-align:center;">
-<img src="./assets/images/1024.png" width="50%" id="full_mem">
+<img src="./assets/images/1024.webp" width="50%" id="full_mem">
 <figcaption>Extracted 256KB Flash Memory</figcaption>
 </figure>
 
 
 
+* * *
+<!-- ### Authors -->
+### This research was carried out by `Jerin Sunny` and `Shakir Zari` and published on behalf of the FEV Secure Lab.
 
-### Authors
-#### This research has been performed by `Jerin Sunny` and `Shakir Zari` and published on behalf of the FEV Secure Lab.
+* * *

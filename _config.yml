@@ -3,7 +3,15 @@ description: Bypassing Read Protection to extract firmware from STM32 Microcontr
 show_downloads: false
 google_analytics:
 theme: jekyll-theme-hacker
-author: Jerin Sunny, Shakir Zari
+author1: Jerin Sunny
+author2: Shakir Zari
+author1_profile_pic: https://avatars.githubusercontent.com/u/166545686
+author1_profile_link : https://www.linkedin.com/in/jerin-sunny/
+
+author2_profile_pic: https://avatars.githubusercontent.com/u/166615503
+author2_profile_link : https://www.linkedin.com/in/shakir-zari/ 
+
+
 
 owner : Jerin Sunny
 year: 2024
