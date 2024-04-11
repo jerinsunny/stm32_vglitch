@@ -1,6 +1,6 @@
 title: Voltage glitching on STM32F4 MCUs
 tagline : Voltage glitching on STM32F4 MCUs
-description: Bypassing Read Protection to extract firmware from STM32 Microcontrollers.
+description: "Bypassing Read Protection to extract firmware from STM32 Microcontrollers."
 headline: Voltage glitching on STM32F4 MCUs
 show_downloads: false
 google_analytics: G-DW62RVHCXG
@@ -26,6 +26,7 @@ plugins:
   - jekyll-seo-tag
 
 
+#custom variables
 author1: Jerin Sunny
 author2: Shakir Zari
 author1_profile_pic: https://avatars.githubusercontent.com/u/166545686
