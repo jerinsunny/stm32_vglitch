@@ -2,7 +2,7 @@
 layout: default
 ---
 
-## Overview1
+## Overview
 This blog describes voltage glitching attack on **STM32F4** series MCU. This post aims to provide a practical example of executing a voltage glitching attack, while also discussing the challenges and limitations one might encounter during the process.
 
 ## Introduction to Voltage Glitching
