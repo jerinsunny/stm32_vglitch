@@ -8,13 +8,8 @@ theme: jekyll-theme-hacker
 author:
   name: Jerin Sunny
 
-author1: Jerin Sunny
-author2: Shakir Zari
-author1_profile_pic: https://avatars.githubusercontent.com/u/166545686
-author1_profile_link : https://www.linkedin.com/in/jerin-sunny/
-
-author2_profile_pic: https://avatars.githubusercontent.com/u/166615503
-author2_profile_link : https://www.linkedin.com/in/shakir-zari/ 
+url: https://jerinsunny.github.io
+baseurl: /stm32_vglitch/
 
 image : ./assets/images/banner.webp
 
@@ -24,8 +19,17 @@ year: 2024
 date: 10-04-2024
 
 twitter:
-  title: Voltage glitching on STM32F4 MCU
+  title: Voltage glitching on STM32F4 MCUs
   card: summary_large_image
 
 plugins:
   - jekyll-seo-tag
+
+
+author1: Jerin Sunny
+author2: Shakir Zari
+author1_profile_pic: https://avatars.githubusercontent.com/u/166545686
+author1_profile_link : https://www.linkedin.com/in/jerin-sunny/
+
+author2_profile_pic: https://avatars.githubusercontent.com/u/166615503
+author2_profile_link : https://www.linkedin.com/in/shakir-zari/ 

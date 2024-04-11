@@ -5,5 +5,8 @@ source "https://rubygems.org"
 gem "jekyll", ">= 3.8.5"
 
 gemspec
-gem 'jekyll-seo-tag'
+
+group :jekyll_plugins do
+    gem 'jekyll-seo-tag'
+end
 
