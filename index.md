@@ -53,8 +53,7 @@ The STM32 Bootloader supports USART protocol and provides a lot of features. Thi
 </figure>
 
 
-We are interested in the Read Memory Command as it helps us to dump the flash memory contents of the MCU. The only limitation here is that it allows us to read only 256 bytes of memory starting from a specified address location.
-
+We are interested in the Read Memory Command as it helps us to dump the flash memory contents of the MCU. The key takeaway is that the Read command has a limit—it only fetches 256 bytes of memory, starting from a specific memory address location.
 
 ## STM32 Security Overview
 
@@ -69,7 +68,7 @@ STM32F4 basically provides three levels of [Read Out Protection](https://www.st.
 
 
 RDP0
-> This is the Default level. In this mode there is not protection.
+> This is the Default level. In this mode there is no protection.
 
 RDP1
 > In RDP Level 1 there is no access to Flash Memory. Reading, programming and erasing the flash memory, even through SWD or JTAG is also disabled. Any read request to the protected Flash memory generates a bus error. In this level booting from SRAM and system bootloader is allowed.
@@ -101,10 +100,13 @@ As mentioned earlier, we have used [STM32F401CCU6 Minimum System STM32 ARM Core 
 
 Every system has components designed to specifically maintain the its operating voltage at the appropriate levels, such as decoupling capacitors. One of the challenges/requirement with this method is to modify/tamper  the hardware circuitry in order to overcome the protection offered by these components. This includes removal of some components, replacing with custom components, as well as selecting the glitch injection point.
 
-We have used VCAP_1 as glitch injection point. The decoupling capacitors were replaced, which would increase the impact  of our glitch on the target. A custom glitch injection circuit consisting of capacitors, resistors and mosfet, the values of which were finalized after multiple trials were used to inject the glitch to the injection point.
+We have used VCAP_1 as glitch injection point. The decoupling capacitors were replaced, which would increase the impact  of our glitch on the target. A custom glitch injection circuit consisting of capacitors, resistors and MOSFETs was created to ensure precise glitch injection. Each component was carefully chosen following comprehensive research to ensure the circuit delivers the desired glitch reliably.
 
-We have used `Teensy` board to develop our glitcher software, which would help us to control the glitch and precisely inject the required glitch.   
-Other popular options glitching tools such as `Chipwhisperer Lite` were tried, and since the UART protocol  used by the STM32 bootloader requires an even parity.  It proved challenging to us as it did not allow us easily to modify the UART parity bit. 
+We used `Teensy` board to develop our glitcher software, which would help us to control the glitch and precisely inject the required glitch.   
+We tested out other glitching tools such as `Chipwhisperer Lite`, but hit a snag with the STM32 bootloader's UART protocol, which demands an even parity bit. It was a tough nut to crack because Chipwhisperer Lite's didn't offer a straightforward way to tweak the UART parity bit.  
+
+We came across a fix for this issue in a recent [article](https://sec-consult.com/blog/detail/secglitcher-part-1-reproducible-voltage-glitching-on-stm32-microcontrollers/), but we were already underway with our research when it was released, and had already started a different approach at that time.
+
 
 The hardware setup used for the research is shown in the figure below.
 <figure style="text-align:center;">
@@ -112,7 +114,7 @@ The hardware setup used for the research is shown in the figure below.
 <figcaption>Hardware Setup </figcaption>
 </figure>
 
-Teensy board is communicating serially to the targets UART port. It also controls the glitch injection circuit, to inject the glitch precisely. We soldered the output of glitch injection circuit to VCAP_1, ensuring minimal losses to the glitch. The specified logic levels are applied on the Boot Pins so that the target boots into the bootloader mode as mentioned [above](#enabling-bootloader). 
+Teensy board is communicating serially to the targets UART port. It also controls the glitch injection circuit, to inject the glitch precisely. We soldered the output of glitch injection circuit to VCAP_1, ensuring minimal losses to the glitch. The specified logic levels are applied on the Boot Pins so that the target boots into the bootloader mode as mentioned in the section [Enabling Bootloader](#enabling-bootloader). 
 
 ### Software Setup
 
@@ -152,7 +154,7 @@ elif result == nack:
 Once the hardware and software is setup, we ran the setup for obtaining initial characterization. Obtain the glitch parameters from the characterization tests done. Observe the glitch on an oscilloscope to corelate the software glitch parameters with the actual glitch impact. Narrow down the glitch parameters after each run based on the characterization results obtained.
 
 <figure style="text-align:center;">
-<img src="./assets/images/oscilloscope.webp" width="65%" >
+<img src="./assets/images/oscilloscope.webp" width="75%" >
 <figcaption>Observing Trigger and Glitch Parameters  </figcaption>
 </figure>
  
@@ -163,9 +165,7 @@ During the process of narrowing down the glitch parameters, we observed that pos
   <source src="./assets/gifs/Pcrop.webm" type="video/webm" />
 </video>
 
-
-On further analysis, it was understood that, Option Byte for PCROP (SPRMOD) got set during the glitching process.
-
+Upon further analysis, it became apparent that the Option Byte for PCROP (SPRMOD) was inadvertently getting set during the voltage glitching process. This suggests the need to fine-tune the glitch to prevent unintended setting of PCROP during glitching.
 <figure style="text-align:center;">
 <img src="./assets/images/pcrop.webp" width="95%" >
 <figcaption>PCROP Bit getting set during glitching </figcaption>
@@ -203,6 +203,6 @@ After around **`22hrs`** and 1024 successful glitches out of 621594 glitches, th
 
 * * *
 <!-- ### Authors -->
-### This research was carried out by `Jerin Sunny` and `Shakir Zari` and published on behalf of the FEV Secure Lab.
+### This research was carried out by [`Jerin Sunny`]({{site.author1_profile_link}}) and [`Shakir Zari`]({{site.author2_profile_link}}){:target="_blank"} and published on behalf of the [`FEV Secure Lab`](https://in.linkedin.com/company/fev-india){:target="_blank"}.
 
 * * *
