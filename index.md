@@ -37,7 +37,7 @@ Boot ROMs are the initial piece of code within microcontrollers that are execute
 BOOT ROMs play a crucial role in the initial bootstrapping process of the microcontroller, ensuring proper initialization before handing control over to the main application code. They are integral to the startup sequence of the microcontroller and help establish a stable and functional operating environment for the device.  
 
 
-The bootloader is stored in the internal boot ROM (system memory) of STM32 devices, and is programmed by ST during production. Its main task is to reprogram the Flash memory through one of the available serial peripherals. More details on the STM32 Bootloader can be found in [AN2606:Application Note](https://www.st.com/resource/en/application_note/cd00167594-stm32-microcontroller-system-memory-boot-mode-stmicroelectronics.pdf)
+The bootloader is stored in the internal boot ROM (system memory) of STM32 devices, and is programmed by STM during production. Its main task is to reprogram the Flash memory through one of the available serial peripherals. More details on the STM32 Bootloader can be found in [AN2606:Application Note](https://www.st.com/resource/en/application_note/cd00167594-stm32-microcontroller-system-memory-boot-mode-stmicroelectronics.pdf)
 
 
 ### Enabling Bootloader 
@@ -89,7 +89,7 @@ For `Voltage Glitching` attack, we need to target the power supply of the MCU. E
 <figcaption>STM32F4  Power Supply Scheme </figcaption>
 </figure>
 
-From the power supply scheme it is clear that we need to target the voltage regulator to inject faults into the power rails. VCAP_1 and VCAP_2 gives us direct access to internal power rails. 
+From the power supply scheme it is clear that we need to target the voltage regulator to inject faults into the power rails. VCAP_1 and VCAP_2 pins gives us direct access to internal power rails. 
 
 ## Glitch Setup
 
@@ -114,7 +114,7 @@ The hardware setup used for the research is shown in the figure below.
 <figcaption>Hardware Setup </figcaption>
 </figure>
 
-Teensy board is communicating serially to the targets UART port. It also controls the glitch injection circuit, to inject the glitch precisely. We soldered the output of glitch injection circuit to VCAP_1, ensuring minimal losses to the glitch. The specified logic levels are applied on the Boot Pins so that the target boots into the bootloader mode as mentioned in the section [Enabling Bootloader](#enabling-bootloader). 
+Teensy board is communicating serially to the targets UART port. It also controls the glitch injection circuit, to inject the glitch precisely. We soldered the output of glitch injection circuit to VCAP_1 pin, ensuring minimal losses to the glitch. The specified logic levels are applied on the Boot Pins so that the target boots into the bootloader mode as mentioned in the section [Enabling Bootloader](#enabling-bootloader). 
 
 ### Software Setup
 
@@ -132,7 +132,7 @@ ST-Link V2 Programmer was used to connect to the target via the SWD interface. W
 </figure>
 
 ### Glitcher Software
-Our aim is to dump the software, as mentioned [earlier](#stm32-bootloader-features) we will be targeting the Read Memory command(0x11). As described [here]((https://www.st.com/resource/en/application_note/cd00264342-usart-protocol-used-in-the-stm32-bootloader-stmicroelectronics.pdf)), on receiving the Read Memory command, the device checks if any RDP levels is set or not and based on that access to flash memory is provided. If RDP is active the device returns NACK byte for the Read Memory command else the device returns ACK byte.
+As our aim is to dump the firmware, as mentioned [earlier](#stm32-bootloader-features) we will be targeting the Read Memory command(0x11). As described [here]((https://www.st.com/resource/en/application_note/cd00264342-usart-protocol-used-in-the-stm32-bootloader-stmicroelectronics.pdf)), on receiving the Read Memory command, the device checks if any RDP levels is set or not and based on that access to flash memory is provided. If RDP is active the device returns NACK byte for the Read Memory command else the device returns ACK byte.
 
 The glitcher software performs the following operation 
 ```python 
@@ -151,7 +151,7 @@ elif result == nack:
 
 ## Glitching the target
 
-Once the hardware and software is setup, we ran the setup for obtaining initial characterization. Obtain the glitch parameters from the characterization tests done. Observe the glitch on an oscilloscope to corelate the software glitch parameters with the actual glitch impact. Narrow down the glitch parameters after each run based on the characterization results obtained.
+Once the hardware and software is setup, we ran the setup for obtaining initial characterization. Obtain the glitch parameters from the characterization tests done. The key parameters for voltage glitching are - Glitch Offset and Glitch  Width. Glitch Offset dictates when to inject the glitch. Glitch Width determines the duration of the glitch to be applied. Observe the glitch on an oscilloscope to corelate the software glitch parameters with the actual glitch impact. Narrow down the glitch parameters after each run based on the characterization results obtained.
 
 <figure style="text-align:center;">
 <img src="./assets/images/oscilloscope.webp" width="75%" >
